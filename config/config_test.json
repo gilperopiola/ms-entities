@@ -1,0 +1,14 @@
+{
+    "port": "8082",
+    "debug": false,
+    "database": {
+        "type": "mysql",
+        "username": "root",
+        "password": "",
+        "hostname": "127.0.0.1",
+        "port": "3306",
+        "schema": "ms-entities-test",
+        "create_schema": true,
+        "purge": true
+    }
+}
