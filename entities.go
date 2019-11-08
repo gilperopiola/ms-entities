@@ -17,7 +17,7 @@ type Entity struct {
 	Description string
 	Kind        string
 	Importance  int
-	Status      int
+	Status      int //1 = enabled
 	DateCreated time.Time
 }
 
@@ -110,8 +110,8 @@ func (entity *Entity) Get() (*Entity, error) {
 }
 
 func (entity *Entity) Update() (*Entity, error) {
-	_, err := db.DB.Exec(`UPDATE entities SET name = ?, description = ?, importance = ?, status = ? WHERE id = ?`,
-		entity.Name, entity.Description, entity.Importance, entity.Status, entity.ID)
+	_, err := db.DB.Exec(`UPDATE entities SET name = ?, description = ?, kind = ?, importance = ?, status = ? WHERE id = ?`,
+		entity.Name, entity.Description, entity.Kind, entity.Importance, entity.Status, entity.ID)
 	if err != nil {
 		return &Entity{}, err
 	}
