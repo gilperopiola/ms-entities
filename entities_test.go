@@ -101,4 +101,21 @@ func TestUpdateEntity(t *testing.T) {
 	assert.Equal(t, "Description 2", entity.Description)
 	assert.Equal(t, 2, entity.Importance)
 	assert.Equal(t, 2, entity.Status)
+
+	entity.Importance = 3
+	entity, err = entity.UpdateImportance()
+	assert.NoError(t, err)
+	assert.Equal(t, 3, entity.Importance)
+}
+
+func TestDisableEntity(t *testing.T) {
+	cfg.Setup("test")
+	db.Setup(cfg)
+	defer db.Close()
+
+	entity, _ := createTestEntityStruct(1).Create()
+
+	entity, err := entity.Disable()
+	assert.NoError(t, err)
+	assert.Equal(t, 2, entity.Status)
 }

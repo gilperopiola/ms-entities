@@ -28,8 +28,13 @@ func (router *MyRouter) Setup() {
 	entity := router.Group("/Entity")
 	{
 		entity.POST("", CreateEntity)
+
 		entity.GET("", SearchEntities)
 		entity.GET("/:id_entity", GetEntity)
+
 		entity.PUT("/:id_entity", UpdateEntity)
+		entity.PUT("/:id_entity/Importance/:importance", UpdateEntityImportance)
+
+		entity.DELETE("/:id_entity", DisableEntity)
 	}
 }

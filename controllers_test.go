@@ -79,4 +79,22 @@ func TestUpdateEntityController(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &entity)
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.Equal(t, "Name 2", entity.Name)
+
+	response = entity.GenerateTestRequest("PUT", "/"+strconv.Itoa(entity.ID)+"/Importance/3")
+	json.Unmarshal(response.Body.Bytes(), &entity)
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, 3, entity.Importance)
+}
+
+func TestDisableEntityController(t *testing.T) {
+	cfg.Setup("test")
+	db.Setup(cfg)
+	defer db.Close()
+	rtr.Setup()
+
+	entity, _ := createTestEntityStruct(1).Create()
+	response := entity.GenerateTestRequest("DELETE", "/"+strconv.Itoa(entity.ID))
+	json.Unmarshal(response.Body.Bytes(), &entity)
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, 2, entity.Status)
 }

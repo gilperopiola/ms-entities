@@ -17,7 +17,7 @@ type Entity struct {
 	Description string
 	Kind        string
 	Importance  int
-	Status      int //1 = enabled
+	Status      int //1 = enabled, 2 = disabled
 	DateCreated time.Time
 }
 
@@ -28,10 +28,6 @@ type EntityActions interface {
 	Get() (*Entity, error)
 	Update() (*Entity, error)
 	Delete() (*Entity, error)
-}
-
-//EntityInternals are the actual functions that work on the database
-type EntityInternals interface {
 }
 
 //EntityTestingActions are functions that aid in testing
@@ -52,7 +48,7 @@ type EntitiesSearchParameters struct {
 	Offset int
 }
 
-//EntityActions
+//Create inserts a new entity on the database
 func (entity *Entity) Create() (*Entity, error) {
 	result, err := db.DB.Exec(`INSERT INTO entities (name, description, kind, importance) VALUES (?, ?, ?, ?)`, entity.Name, entity.Description, entity.Kind, entity.Importance)
 	if err != nil {
@@ -64,6 +60,7 @@ func (entity *Entity) Create() (*Entity, error) {
 	return entity.Get()
 }
 
+//Search retrieves all the entities that match certain parameters
 func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error) {
 	orderByString := "id ASC"
 	if params.SortField != "" && params.SortDirection != "" {
@@ -99,6 +96,7 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 	return entities, nil
 }
 
+//Get retrieves a single entity
 func (entity *Entity) Get() (*Entity, error) {
 	err := db.DB.QueryRow(`SELECT name, description, kind, importance, status, dateCreated FROM entities WHERE id = ?`, entity.ID).
 		Scan(&entity.Name, &entity.Description, &entity.Kind, &entity.Importance, &entity.Status, &entity.DateCreated)
@@ -109,6 +107,7 @@ func (entity *Entity) Get() (*Entity, error) {
 	return entity, nil
 }
 
+//Update modifies an entity
 func (entity *Entity) Update() (*Entity, error) {
 	_, err := db.DB.Exec(`UPDATE entities SET name = ?, description = ?, kind = ?, importance = ?, status = ? WHERE id = ?`,
 		entity.Name, entity.Description, entity.Kind, entity.Importance, entity.Status, entity.ID)
@@ -119,9 +118,27 @@ func (entity *Entity) Update() (*Entity, error) {
 	return entity.Get()
 }
 
-//EntityInternals
+//UpdateImportance modifies an entity's importance
+func (entity *Entity) UpdateImportance() (*Entity, error) {
+	_, err := db.DB.Exec(`UPDATE entities SET importance = ? WHERE id = ?`, entity.Importance, entity.ID)
+	if err != nil {
+		return &Entity{}, err
+	}
 
-//EntityTestingActions
+	return entity.Get()
+}
+
+//Disable disables an entity
+func (entity *Entity) Disable() (*Entity, error) {
+	_, err := db.DB.Exec(`UPDATE entities SET status = ? WHERE id = ?`, 2, entity.ID)
+	if err != nil {
+		return &Entity{}, err
+	}
+
+	return entity.Get()
+}
+
+//GenerateTestRequest sends an HTTP request to the given URL with the given method
 func (entity *Entity) GenerateTestRequest(method, url string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	body := entity.GetJSONBody()
@@ -130,6 +147,7 @@ func (entity *Entity) GenerateTestRequest(method, url string) *httptest.Response
 	return w
 }
 
+//GetJSONBody returns an entity as the JSON necessary to send an HTTP request
 func (entity *Entity) GetJSONBody() string {
 	body := `{
 		"name": "` + entity.Name + `",
@@ -141,6 +159,7 @@ func (entity *Entity) GetJSONBody() string {
 	return body
 }
 
+//generateSearchURLString generates the last part of the URL for the search endpoint
 func (params *EntitiesSearchParameters) generateSearchURLString() string {
 	return fmt.Sprintf("?kind=%s&name=%s&sortField=%s&sortDirection=%s&limit=%d&offset=%d",
 		params.FilterKind, params.FilterName, params.SortField, params.SortDirection, params.Limit, params.Offset)

@@ -79,3 +79,27 @@ func UpdateEntity(c *gin.Context) {
 
 	c.JSON(http.StatusOK, entity)
 }
+
+func UpdateEntityImportance(c *gin.Context) {
+	entity := &Entity{ID: frutils.ToInt(c.Param("id_entity")), Importance: frutils.ToInt(c.Param("importance"))}
+
+	entity, err := entity.UpdateImportance()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, db.BeautifyError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, entity)
+}
+
+func DisableEntity(c *gin.Context) {
+	entity := &Entity{ID: frutils.ToInt(c.Param("id_entity"))}
+
+	entity, err := entity.Disable()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, db.BeautifyError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, entity)
+}
