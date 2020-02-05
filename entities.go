@@ -72,8 +72,6 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 						  FROM entities WHERE (kind LIKE ? or name LIKE ?) AND status = 1
 						  ORDER BY %s LIMIT ? OFFSET ?`, orderByString)
 
-	log.Println(query)
-
 	params.FilterKind = "%" + params.FilterKind + "%"
 	params.FilterName = "%" + params.FilterName + "%"
 
@@ -81,6 +79,7 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 
 	defer rows.Close()
 	if err != nil {
+		log.Println(err.Error())
 		return []*Entity{}, err
 	}
 
