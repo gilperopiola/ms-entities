@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -68,6 +67,10 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 		orderByString = params.SortField + " " + params.SortDirection
 	}
 
+	if limit == 0 {
+		limit = 99999
+	}
+
 	query := fmt.Sprintf(`SELECT id, name, description, kind, importance, status, dateCreated 
 						  FROM entities WHERE (kind LIKE ? or name LIKE ?) AND status = 1
 						  ORDER BY %s LIMIT ? OFFSET ?`, orderByString)
@@ -79,7 +82,6 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 
 	defer rows.Close()
 	if err != nil {
-		log.Println(err.Error())
 		return []*Entity{}, err
 	}
 
