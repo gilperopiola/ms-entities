@@ -67,10 +67,6 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 		orderByString = params.SortField + " " + params.SortDirection
 	}
 
-	if limit == 0 {
-		limit = 99999
-	}
-
 	query := fmt.Sprintf(`SELECT id, name, description, kind, importance, status, dateCreated 
 						  FROM entities WHERE (kind LIKE ? or name LIKE ?) AND status = 1
 						  ORDER BY %s LIMIT ? OFFSET ?`, orderByString)

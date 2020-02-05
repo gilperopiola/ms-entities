@@ -39,6 +39,10 @@ func SearchEntities(c *gin.Context) {
 		Offset: frutils.ToInt(c.Query("offset")),
 	}
 
+	if params.Limit == 0 {
+		params.Limit = 99999
+	}
+
 	entities, err := entity.Search(params)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, db.BeautifyError(err))
