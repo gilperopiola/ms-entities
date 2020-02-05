@@ -68,7 +68,7 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 	}
 
 	query := fmt.Sprintf(`SELECT id, name, description, kind, importance, status, dateCreated 
-						  FROM entities WHERE kind LIKE ? AND name LIKE ? AND status = 1
+						  FROM entities WHERE (kind LIKE ? or name LIKE ?) AND status = 1
 						  ORDER BY %s LIMIT ? OFFSET ?`, orderByString)
 
 	params.FilterKind = "%" + params.FilterKind + "%"
