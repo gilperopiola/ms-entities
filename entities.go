@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -70,6 +71,8 @@ func (entity *Entity) Search(params *EntitiesSearchParameters) ([]*Entity, error
 	query := fmt.Sprintf(`SELECT id, name, description, kind, importance, status, dateCreated 
 						  FROM entities WHERE (kind LIKE ? or name LIKE ?) AND status = 1
 						  ORDER BY %s LIMIT ? OFFSET ?`, orderByString)
+
+	log.Println(query)
 
 	params.FilterKind = "%" + params.FilterKind + "%"
 	params.FilterName = "%" + params.FilterName + "%"
